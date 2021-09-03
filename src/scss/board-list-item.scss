@@ -1,0 +1,41 @@
+.board-list-item {
+    height: 100px;
+    font-size: 36px;
+    
+    border: black dashed 2px ;
+    margin: 10px 0;
+    padding-left: 50px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    a {
+        height: 100%;
+        width: 100%;
+        text-decoration: none;
+        color: black;
+        display: flex;
+        align-items: center;
+    }
+
+    a:focus {
+        color: brown;
+    }
+
+
+    &__coffee {
+        position: absolute;
+        right: -50px;
+        top: 0;
+        bottom: 0;
+        margin-top: auto;
+        margin-bottom: auto;
+        transition: right 300ms ease;
+    }
+
+    &:hover {
+        .board-list-item__coffee {
+            right: 20px;
+        }
+    }
+}

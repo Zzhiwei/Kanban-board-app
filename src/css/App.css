@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@1,600&display=swap");
+html {
+  font-family: 'Azeret Mono', monospace;
+}
+
+.heading {
+  font-size: 50px;
+  text-align: center;
+}
+
+.max-width {
+  max-width: calc(min(1000px, 95%));
+  margin: auto;
+  background: white;
+  border-radius: 10px;
+}
+
+.home {
+  width: 100%;
+}
+
+.home__board-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.board__columns {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (minmax(300px, 1fr))[auto-fill];
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-rows: minmax(300px, auto);
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.board__column {
+  border: chocolate 5px solid;
+  background: coral;
+}
+
+.board__column-title {
+  text-align: center;
+  -webkit-text-decoration-style: wavy;
+          text-decoration-style: wavy;
+}
+/*# sourceMappingURL=App.css.map */
