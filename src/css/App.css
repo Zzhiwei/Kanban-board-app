@@ -1,6 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@1,600&display=swap");
 html {
   font-family: 'Azeret Mono', monospace;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit;
+  margin: 0;
+  padding: 0;
 }
 
 .heading {
@@ -38,11 +49,28 @@ html {
 .board__column {
   border: chocolate 5px solid;
   background: coral;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-line-pack: start;
+      align-content: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .board__column-title {
   text-align: center;
   -webkit-text-decoration-style: wavy;
           text-decoration-style: wavy;
+  width: 100%;
+  padding: 20px;
+}
+
+.board__draggable-container {
+  width: 100%;
+  height: calc(100% - 77px);
 }
 /*# sourceMappingURL=App.css.map */

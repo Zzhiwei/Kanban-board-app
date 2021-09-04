@@ -2,11 +2,18 @@
 
 
 html {
-    font-family: 'Azeret Mono', monospace;;
+    font-family: 'Azeret Mono', monospace;
+    box-sizing: border-box;
 }
 
-body {
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	margin: 0;
+	padding: 0;
 }
+
 
 .heading {
     font-size: 50px;
@@ -44,12 +51,25 @@ body {
         // background: cadetblue;
         border: chocolate 5px solid;
         background: coral;
+        display: flex;
+        align-items: flex-start;
+        align-content: flex-start;
+        flex-wrap: wrap;
+
 
     }
 
     &__column-title {
         text-align: center;
         text-decoration-style: wavy;
+        width: 100%;
+        padding: 20px;
+    }
+
+    &__draggable-container {
+        width: 100%;
+        height: calc(100% - 77px);
+        
     }
 
 
