@@ -5,4 +5,9 @@
   border-radius: 5px;
   margin: 10px auto;
 }
+
+.task.dragging {
+  opacity: 0.5;
+  border: 2px dashed grey;
+}
 /*# sourceMappingURL=Task.css.map */
