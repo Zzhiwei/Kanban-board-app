@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import Task from '../components/Task'
 import '../css/App.css'
 
@@ -10,7 +10,7 @@ function getDragAfterElement(container, dropYCoordinate) {
     const box = taskBox.getBoundingClientRect()
     const offsetBtwTaskAndDrop = dropYCoordinate - box.top - box.height / 2
     if (offsetBtwTaskAndDrop < 0 ) {
-      //if drop is above element, return the element
+      //negative offsetBtwTaskAndDrop means drop is above element
       return taskBox
     } else {
       return closest
@@ -21,24 +21,42 @@ function getDragAfterElement(container, dropYCoordinate) {
 
 /*
 I am using vanilla js to do the drag N drop entirely,
-
 If i were to do it with react, I would keep a state of what each container has,
 then at drop event change state causing rerender.
 */
 
 export default function Board() {
+  const [boardData, setBoardData] = useState(null);
 
-  const renderTodoTasks = useCallback(() => {
-    console.log("rendering todo tasks")
-  },[])
+  useEffect(() => {
+    const boardData = JSON.parse(localStorage.getItem("boardData"));
+    setBoardData(boardData)
+  }, [])
 
-  const renderDoneTasks = useCallback(() => {
-    console.log("rendering done tasks")
-  },[])
+  /*
+  There is absolutely no need to use useCallback here honestly, there is no "callback" 
+  happening here. Use it only when children depends on a function being passed down
+  */
+  const getTodoTasks = () => {
+    if (!boardData) {
+      return
+    }
+    return boardData.todo
+  }
 
-  const renderInProgressTasks = useCallback(() => {
-    console.log("rendering in progress tasks")
-  },[])
+  const getDoneTasks = () => {
+    if (!boardData) {
+      return
+    }
+    return boardData.inProgress
+  }
+
+  const getInProgressTasks = () => {
+    if (!boardData) {
+      return
+    }
+    return boardData.done
+  }
   
 
   
@@ -75,7 +93,9 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container">
                 {
-                  renderTodoTasks()
+                  getTodoTasks()?.map((task, id) => (
+                    <Task description={task} key={id}/>
+                  ))
                 }
                 <Task description="1" />
                 <Task description="2" />
@@ -88,19 +108,24 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container">
                 {
-                  renderInProgressTasks()
+                  getInProgressTasks()?.map((task, id) => (
+                    <Task description={task} key={id}/>
+                  ))
                 }
                 <Task description="3" />
               </div>
             </div>
             <div className="board__column board__done">
               <h1 className="board__column-title">
-              {
-                  renderDoneTasks()
-                }
+              
                 Done
               </h1>
               <div className="board__draggable-container">
+                {
+                  getDoneTasks()?.map((task, id) => (
+                    <Task description={task} key={id}/>
+                  ))
+                }
                 <Task description="4" />
               </div>
             </div>
