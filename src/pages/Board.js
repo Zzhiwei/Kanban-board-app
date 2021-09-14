@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react'
 import Task from '../components/Task'
 import '../css/App.css'
 
-
+//in modular js, function is not added to global object property
 function getDragAfterElement(container, dropYCoordinate) {
   const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
 
@@ -26,12 +26,41 @@ then at drop event change state causing rerender.
 */
 
 export default function Board() {
+  console.log("rendering")
+  const DATA_STORAGE_NAME = "boardData"
   const [boardData, setBoardData] = useState(null);
 
+  /*
+  1)using a param for boardData instead of using state directly
+  removes dependency of children
+  2)DATA_STORAGE_NAME is constant => so don't need add dependency?
+  */
+  const saveBoardData = useCallback((boardData) => {
+    localStorage.setItem(DATA_STORAGE_NAME, JSON.stringify(boardData))
+  }, []) 
+
+  
   useEffect(() => {
-    const boardData = JSON.parse(localStorage.getItem("boardData"));
-    setBoardData(boardData)
+    //retrieve data
+    const storageData = localStorage.getItem(DATA_STORAGE_NAME)
+    if (storageData !== "undefined") {
+      const boardData = JSON.parse(storageData)
+      setBoardData(boardData)
+    }
+    
+    //save data when user closes or navigates away
+    window.addEventListener('beforeunload', saveBoardData)
+
+    return () => {
+      window.removeEventListener('beforeunload', saveBoardData)
+      saveBoardData()
+    }
   }, [])
+
+  //save data to storage every time boardData changes
+  useEffect(() => {
+    saveBoardData(boardData)
+  }, [boardData])
 
   /*
   There is absolutely no need to use useCallback here honestly, there is no "callback" 
@@ -57,6 +86,7 @@ export default function Board() {
     }
     return boardData.done
   }
+
   
 
   
@@ -97,9 +127,6 @@ export default function Board() {
                     <Task description={task} key={id}/>
                   ))
                 }
-                <Task description="1" />
-                <Task description="2" />
-
               </div>
             </div>
             <div className="board__column board__in-progress">
@@ -112,7 +139,6 @@ export default function Board() {
                     <Task description={task} key={id}/>
                   ))
                 }
-                <Task description="3" />
               </div>
             </div>
             <div className="board__column board__done">
@@ -126,7 +152,6 @@ export default function Board() {
                     <Task description={task} key={id}/>
                   ))
                 }
-                <Task description="4" />
               </div>
             </div>
           </div>
