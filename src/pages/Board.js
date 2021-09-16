@@ -26,39 +26,48 @@ then at drop event change state causing rerender.
 */
 
 export default function Board() {
-  console.log("rendering")
   const DATA_STORAGE_NAME = "boardData"
   const [boardData, setBoardData] = useState(null);
+  const taskType = {
+    TODO: "todo",
+    IN_PROGRESS: "inProgress",
+    DONE: "done"
+  }
 
   /*
   1)using a param for boardData instead of using state directly
   removes dependency of children
   2)DATA_STORAGE_NAME is constant => so don't need add dependency?
   */
-  const saveBoardData = useCallback((boardData) => {
+  const saveBoardData = (boardData) => {
     localStorage.setItem(DATA_STORAGE_NAME, JSON.stringify(boardData))
-  }, []) 
+  }
 
   
-  useEffect(() => {
+  useEffect(() => {  
     //retrieve data
     const storageData = localStorage.getItem(DATA_STORAGE_NAME)
-    if (storageData !== "undefined") {
+
+    if (storageData) { 
       const boardData = JSON.parse(storageData)
       setBoardData(boardData)
     }
-    
-    //save data when user closes or navigates away
-    window.addEventListener('beforeunload', saveBoardData)
-
-    return () => {
-      window.removeEventListener('beforeunload', saveBoardData)
-      saveBoardData()
-    }
   }, [])
+    
+    /*
+    ```window.addEventListener('beforeunload', saveThisBoardData)```
+    This method is unnecessary as every time user drags and drops, a callback is triggered to save data
+    The implementation of this involves an unsolved problem of accessing latest boardData state 
+    Note the use of useRef to try to access latest state can't work because we are dependent on useState to trigger action
+    after each state change
+    */
+    
 
   //save data to storage every time boardData changes
   useEffect(() => {
+    if (!boardData) {
+      return 
+    }
     saveBoardData(boardData)
   }, [boardData])
 
@@ -87,18 +96,28 @@ export default function Board() {
     return boardData.done
   }
 
-  
 
   
   useEffect(() => {
     const containers = document.querySelectorAll('.board__draggable-container')
+
     containers.forEach(container => {
       container.addEventListener('dragover', e => {
         e.preventDefault()
+
         const dropYCoordiante = e.clientY;
         const taskToPlaceAboveOf = getDragAfterElement(container, dropYCoordiante)
         const isAboveSomeTask = taskToPlaceAboveOf != null
+        
         const draggable = document.querySelector('.dragging')
+        const taskType = draggable.attributes.taskType.value
+        debugger
+
+        const draggableIndex = draggable.attributes.index.value
+
+        //index of start [1][2]
+        //index of end [0][2]
+        
         if (!isAboveSomeTask) {
           container.appendChild(draggable)
         } else {
@@ -106,7 +125,6 @@ export default function Board() {
         }
       })
     })
-
   }, [])
 
 
@@ -124,7 +142,7 @@ export default function Board() {
               <div className="board__draggable-container">
                 {
                   getTodoTasks()?.map((task, id) => (
-                    <Task description={task} key={id}/>
+                    <Task key={id} description={task} taskType={taskType.TODO} />
                   ))
                 }
               </div>
@@ -136,7 +154,7 @@ export default function Board() {
               <div className="board__draggable-container">
                 {
                   getInProgressTasks()?.map((task, id) => (
-                    <Task description={task} key={id}/>
+                    <Task key={id} description={task} taskType={taskType.IN_PROGRESS} />
                   ))
                 }
               </div>
@@ -148,9 +166,13 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container">
                 {
-                  getDoneTasks()?.map((task, id) => (
-                    <Task description={task} key={id}/>
-                  ))
+                  getDoneTasks()?.map((task, id) => {
+                    debugger
+                    return (
+                      //interestingly key is need here, but is undefined inside the child component itself
+                      <Task key={id} index={id} description={task} taskType={taskType.DONE} />
+                    )
+                  })
                 }
               </div>
             </div>

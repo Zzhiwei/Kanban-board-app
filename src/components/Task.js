@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react'
 import '../css/Task.css'
 
-export default function Task({ description }) {
+export default function Task({ index, description, taskType }) {
+  debugger
   const draggableRef = useRef()
 
   useEffect(() => {
@@ -17,7 +18,7 @@ export default function Task({ description }) {
 
 
   return (
-    <div ref={draggableRef} className="task draggable" draggable="true">
+    <div ref={draggableRef} className="task draggable" draggable="true" taskType={taskType} index={index} >
       {description}
     </div>
   )

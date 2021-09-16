@@ -1,0 +1,5 @@
+{
+  "todo": ["eat", "sweep", "sleep"],
+  "inProgress": ["ippt", "cs2103", "cs2102"],
+  "done": ["army", "uni year1", "IB"]
+}
