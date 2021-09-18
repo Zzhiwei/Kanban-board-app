@@ -5,18 +5,23 @@ import '../css/App.css'
 //in modular js, function is not added to global object property
 function getDragAfterElement(container, dropYCoordinate) {
   const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
+  let index = draggableElements.length
+  let closestIndex = draggableElements.length
 
   const taskToPlaceAboveOf = draggableElements.reduceRight((closest, taskBox) => {
+    index = index - 1;
     const box = taskBox.getBoundingClientRect()
     const offsetBtwTaskAndDrop = dropYCoordinate - box.top - box.height / 2
     if (offsetBtwTaskAndDrop < 0 ) {
       //negative offsetBtwTaskAndDrop means drop is above element
+      closestIndex = index
       return taskBox
     } else {
       return closest
     }
   }, null)
-  return taskToPlaceAboveOf
+  
+  return {taskToPlaceAboveOf, closestIndex}
 }
 
 /*
@@ -28,6 +33,7 @@ then at drop event change state causing rerender.
 export default function Board() {
   const DATA_STORAGE_NAME = "boardData"
   const [boardData, setBoardData] = useState(null);
+  const endPosition = useRef(null)
   const taskType = {
     TODO: "todo",
     IN_PROGRESS: "inProgress",
@@ -86,14 +92,14 @@ export default function Board() {
     if (!boardData) {
       return
     }
-    return boardData.inProgress
+    return boardData.done
   }
 
   const getInProgressTasks = () => {
     if (!boardData) {
       return
     }
-    return boardData.done
+    return boardData.inProgress
   }
 
 
@@ -104,20 +110,18 @@ export default function Board() {
     containers.forEach(container => {
       container.addEventListener('dragover', e => {
         e.preventDefault()
-
+        
         const dropYCoordiante = e.clientY;
-        const taskToPlaceAboveOf = getDragAfterElement(container, dropYCoordiante)
+        const {taskToPlaceAboveOf, closestIndex} = getDragAfterElement(container, dropYCoordiante)
         const isAboveSomeTask = taskToPlaceAboveOf != null
         
         const draggable = document.querySelector('.dragging')
-        const taskType = draggable.attributes.taskType.value
-        debugger
 
-        const draggableIndex = draggable.attributes.index.value
+        endPosition.current = {
+          taskType: e.target.attributes.taskType.value,
+          draggableIndex: closestIndex
+        }
 
-        //index of start [1][2]
-        //index of end [0][2]
-        
         if (!isAboveSomeTask) {
           container.appendChild(draggable)
         } else {
@@ -127,7 +131,9 @@ export default function Board() {
     })
   }, [])
 
+  
 
+  // debugger
   return (
     <main className="board">
       <div className="max-width">
@@ -139,10 +145,18 @@ export default function Board() {
               <h1 className="board__column-title">
                 Todo
               </h1>
-              <div className="board__draggable-container">
+              <div className="board__draggable-container" taskType={taskType.TODO}>
                 {
                   getTodoTasks()?.map((task, id) => (
-                    <Task key={id} description={task} taskType={taskType.TODO} />
+                    
+                    <Task
+                      key={id}
+                      index={id}
+                      description={task}
+                      taskType={taskType.TODO}
+                      endPosition={endPosition}
+                      setBoardData={setBoardData}
+                    />
                   ))
                 }
               </div>
@@ -151,11 +165,22 @@ export default function Board() {
               <h1 className="board__column-title">
                 In progress
               </h1>
-              <div className="board__draggable-container">
+              <div className="board__draggable-container" taskType={taskType.IN_PROGRESS}>
                 {
-                  getInProgressTasks()?.map((task, id) => (
-                    <Task key={id} description={task} taskType={taskType.IN_PROGRESS} />
-                  ))
+                  getInProgressTasks()?.map((task, id) => {
+                    debugger
+                    return (
+                      <Task
+                        key={id}
+                        index={id}
+                        description={task}
+                        taskType={taskType.IN_PROGRESS}
+                        endPosition={endPosition}
+                        setBoardData={setBoardData}
+                      />
+                    )
+
+                  })
                 }
               </div>
             </div>
@@ -164,13 +189,20 @@ export default function Board() {
               
                 Done
               </h1>
-              <div className="board__draggable-container">
+              <div className="board__draggable-container" taskType={taskType.DONE}>
                 {
                   getDoneTasks()?.map((task, id) => {
-                    debugger
+                    // debugger
                     return (
                       //interestingly key is need here, but is undefined inside the child component itself
-                      <Task key={id} index={id} description={task} taskType={taskType.DONE} />
+                      <Task
+                        key={task + taskType.DONE}
+                        index={id}
+                        description={task}
+                        taskType={taskType.DONE}
+                        endPosition={endPosition}
+                        setBoardData={setBoardData}
+                      />
                     )
                   })
                 }
