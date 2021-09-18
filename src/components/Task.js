@@ -56,13 +56,12 @@ export default function Task({ index, description, taskType, endPosition, setBoa
       draggable.removeEventListener('dragstart', dragStartCallback)
       draggable.removeEventListener('dragend', dragEndCallback)
     }
-
     
   }, [])
 
   return (
-    <div ref={draggableRef} className="task draggable" draggable="true" taskType={taskType} index={index} >
-      {description}
+    <div ref={draggableRef} className="task draggable" draggable="true" taskType={taskType}>
+      {description }
     </div>
   )
 }

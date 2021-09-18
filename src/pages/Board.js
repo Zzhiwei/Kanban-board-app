@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import Task from '../components/Task'
 import '../css/App.css'
+import { v4 as uuidv4 } from 'uuid';
+
 
 //in modular js, function is not added to global object property
 function getDragAfterElement(container, dropYCoordinate) {
@@ -70,39 +72,13 @@ export default function Board() {
     
 
   //save data to storage every time boardData changes
-  useEffect(() => {
-    if (!boardData) {
-      return 
-    }
-    saveBoardData(boardData)
-  }, [boardData])
-
-  /*
-  There is absolutely no need to use useCallback here honestly, there is no "callback" 
-  happening here. Use it only when children depends on a function being passed down
-  */
-  const getTodoTasks = () => {
-    if (!boardData) {
-      return
-    }
-    return boardData.todo
-  }
-
-  const getDoneTasks = () => {
-    if (!boardData) {
-      return
-    }
-    return boardData.done
-  }
-
-  const getInProgressTasks = () => {
-    if (!boardData) {
-      return
-    }
-    return boardData.inProgress
-  }
-
-
+  // useEffect(() => {
+  //   if (!boardData) {
+  //     return 
+  //   }
+  //   saveBoardData(boardData)
+  // }, [boardData])
+ 
   
   useEffect(() => {
     const containers = document.querySelectorAll('.board__draggable-container')
@@ -147,7 +123,7 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container" taskType={taskType.TODO}>
                 {
-                  getTodoTasks()?.map((task, id) => (
+                  boardData?.todo?.map((task, id) => (
                     
                     <Task
                       key={id}
@@ -167,7 +143,7 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container" taskType={taskType.IN_PROGRESS}>
                 {
-                  getInProgressTasks()?.map((task, id) => {
+                  boardData?.inProgress?.map((task, id) => {
                     debugger
                     return (
                       <Task
@@ -191,12 +167,12 @@ export default function Board() {
               </h1>
               <div className="board__draggable-container" taskType={taskType.DONE}>
                 {
-                  getDoneTasks()?.map((task, id) => {
+                  boardData?.done?.map((task, id) => {
                     // debugger
                     return (
                       //interestingly key is need here, but is undefined inside the child component itself
                       <Task
-                        key={task + taskType.DONE}
+                        key={task}
                         index={id}
                         description={task}
                         taskType={taskType.DONE}
